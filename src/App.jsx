@@ -3,11 +3,11 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Home from "./pages/Home";
 import Dashboard from "./pages/Dashboard";
 import SkillList from "./features/skills/SkillList";
-import ProjectList from "./features/skills/projects/ProjectList";
+import SkillGrid from "./features/skills/SkillGrid";
+import SkillForm from "./features/skills/SkillForm";
 import CertificationList from "./features/skills/certification/CertificationList";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
-import { Code2 } from "lucide-react";
 
 function App() {
   return (
@@ -22,8 +22,10 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/skills" element={<SkillList />} />
-            <Route path="/projects" element={<ProjectList />} />
+            <Route path="/skills" element={<SkillGrid />} />
+            <Route path="/skills/list" element={<SkillList />} />
+            <Route path="/skills/new" element={<SkillForm />} />
+            <Route path="/skills/:id" element={<SkillForm />} />
             <Route path="/certifications" element={<CertificationList />} />
           </Routes>
         </main>
