@@ -5,32 +5,29 @@ import Dashboard from "./pages/Dashboard";
 import SkillList from "./features/skills/SkillList";
 import SkillGrid from "./features/skills/SkillGrid";
 import SkillForm from "./features/skills/SkillForm";
-import CertificationList from "./features/skills/certification/CertificationList";
+import SkillDetails from "./features/skills/SkillDetails";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 
 function App() {
   return (
     <BrowserRouter>
-      {/* Main container with minimum full viewport height */}
       <div className="min-h-screen flex flex-col bg-gradient-to-br from-gray-50 to-gray-100">
-        {/* Header at the top */}
         <Header />
-        
-        {/* Main content area that grows to fill space */}
         <main className="flex-grow container mx-auto px-4 py-6">
           <Routes>
+            {/* Home and Dashboard */}
             <Route path="/" element={<Home />} />
             <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/skills" element={<SkillGrid />} />
-            <Route path="/skills/list" element={<SkillList />} />
+
+            {/* Skill Pages */}
+            <Route path="/skills" element={<SkillGrid />} />      {/* Default skills view */}
+            <Route path="/skills/list" element={<SkillList />} /> {/* Optional alternative view */}
             <Route path="/skills/new" element={<SkillForm />} />
-            <Route path="/skills/:id" element={<SkillForm />} />
-            <Route path="/certifications" element={<CertificationList />} />
+            <Route path="/skills/edit/:id" element={<SkillForm />} />
+            <Route path="/skills/:id" element={<SkillDetails />} />
           </Routes>
         </main>
-        
-        {/* Footer at the bottom */}
         <Footer />
       </div>
     </BrowserRouter>

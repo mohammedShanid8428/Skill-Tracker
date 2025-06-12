@@ -1,115 +1,66 @@
-import React, { useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { deleteSkill } from './SkillSlice';
-import { Link } from 'react-router-dom';
-import { BookOpen, BarChart2, Edit2, Trash2, ChevronRight } from 'lucide-react';
+import React, { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { fetchSkills } from "./SkillSlice"
+import SkillCard from "./SkillCard";
+import { Link } from "react-router-dom";
+import { PlusCircle } from "lucide-react";
 
 const SkillList = () => {
-  const skills = useSelector(state => state.skills.skills);
   const dispatch = useDispatch();
-  const [editData, setEditData] = useState(null);
+  const { skills, status, error } = useSelector((state) => state.skills);
+  const [selectedCategory, setSelectedCategory] = useState("All");
+
+  useEffect(() => {
+    dispatch(fetchSkills());
+  }, [dispatch]);
+
+  const categories = ["All", ...new Set(skills.map((s) => s.category))];
+
+  const filteredSkills =
+    selectedCategory === "All"
+      ? skills
+      : skills.filter((s) => s.category === selectedCategory);
 
   return (
-    <div className="max-w-4xl mx-auto py-8 px-4">
-      <div className="flex justify-between items-center mb-8">
-        <h2 className="text-2xl font-bold flex items-center">
-          <BookOpen className="h-6 w-6 text-blue-500 mr-2" />
-          My Skills
-        </h2>
-        <Link 
-          to="/skills/new" 
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
-        >
-          Add New Skill <ChevronRight className="h-4 w-4 ml-1" />
-        </Link>
-      </div>
-
-      {skills.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-500 mb-4">You haven't added any skills yet.</p>
-          <Link 
-            to="/skills" 
-            className="text-blue-600 hover:underline flex items-center justify-center"
+    <div className="max-w-6xl mx-auto px-4 py-8">
+      <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
+        <h1 className="text-3xl font-bold text-gray-800">My Skills</h1>
+        
+        <div className="flex gap-4">
+          <select
+            value={selectedCategory}
+            onChange={(e) => setSelectedCategory(e.target.value)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm shadow-sm"
           >
-            Browse skill cards to get started <ChevronRight className="h-4 w-4 ml-1" />
+            {categories.map((category, idx) => (
+              <option value={category} key={idx}>
+                {category}
+              </option>
+            ))}
+          </select>
+          
+          <Link
+            to="/skills/new"
+            className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+          >
+            <PlusCircle className="w-5 h-5" />
+            Add Skill
           </Link>
         </div>
-      ) : (
-        <div className="space-y-4">
-          {skills.map(skill => (
-            <div key={skill.id} className="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-shadow">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">{skill.name}</h3>
-                  <div className="flex items-center mt-1 mb-3">
-                    <span className="text-sm font-medium text-gray-500 mr-3">{skill.level}</span>
-                    <div className="flex items-center">
-                      <BarChart2 className="h-4 w-4 text-blue-500 mr-1" />
-                      <span className="text-sm text-gray-500">{skill.progress}% complete</span>
-                    </div>
-                  </div>
-                  
-                  {skill.notes && (
-                    <p className="text-gray-600 mb-3">{skill.notes}</p>
-                  )}
-                  
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {skill.resources.slice(0, 3).map((resource, index) => (
-                      <a 
-                        key={index} 
-                        href={resource} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-xs bg-blue-50 text-blue-600 px-2 py-1 rounded hover:bg-blue-100"
-                      >
-                        Resource {index + 1}
-                      </a>
-                    ))}
-                    {skill.resources.length > 3 && (
-                      <span className="text-xs bg-gray-100 text-gray-500 px-2 py-1 rounded">
-                        +{skill.resources.length - 3} more
-                      </span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="flex space-x-2">
-                  <button
-                    onClick={() => setEditData(skill)}
-                    className="p-2 text-gray-500 hover:text-blue-600 hover:bg-blue-50 rounded-full"
-                  >
-                    <Edit2 className="h-5 w-5" />
-                  </button>
-                  <button
-                    onClick={() => dispatch(deleteSkill(skill.id))}
-                    className="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-full"
-                  >
-                    <Trash2 className="h-5 w-5" />
-                  </button>
-                </div>
-              </div>
-              
-              <div className="pt-4 border-t border-gray-100 flex justify-between items-center">
-                <div className="text-sm text-gray-500">
-                  Last updated: {new Date(skill.lastUpdated).toLocaleDateString()}
-                </div>
-                <Link 
-                  to={`/skills/${skill.id}`} 
-                  className="text-sm text-blue-600 hover:underline flex items-center"
-                >
-                  View details <ChevronRight className="h-4 w-4 ml-1" />
-                </Link>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
+      </div>
 
-      {editData && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <SkillForm editData={editData} setEditData={setEditData} />
-          </div>
+      {status === "loading" && <p className="text-center">Loading skills...</p>}
+      {status === "failed" && <p className="text-center text-red-500">{error}</p>}
+
+      {status === "succeeded" && filteredSkills.length === 0 ? (
+        <div className="text-center text-gray-500 mt-10">
+          No skills found. Add a new skill to get started.
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filteredSkills.map((skill) => (
+            <SkillCard key={skill.id} skill={skill} />
+          ))}
         </div>
       )}
     </div>

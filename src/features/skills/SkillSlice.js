@@ -1,147 +1,108 @@
-import { createSlice } from "@reduxjs/toolkit";
+// src/features/skills/SkillSlice.js
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { toast } from "react-hot-toast";
 
+const API_URL = "http://localhost:3000/skills";
+
+// Thunks
+export const fetchSkills = createAsyncThunk("skills/fetchSkills", async () => {
+  try {
+    const response = await axios.get(API_URL); // Correct URL
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+});
+
+export const fetchSkillById = createAsyncThunk("skills/fetchSkillById", async (id) => {
+  try {
+    const response = await axios.get(`${API_URL}/${id}`);
+    return response.data;
+  } catch (error) {
+    throw error.response?.data || error.message;
+  }
+});
+
+export const addSkill = createAsyncThunk("skills/addSkill", async (skillData) => {
+  try {
+    const response = await axios.post(API_URL, skillData);
+    toast.success("Skill added successfully");
+    return response.data;
+  } catch (error) {
+    toast.error("Failed to add skill");
+    throw error.response?.data || error.message;
+  }
+});
+
+export const updateSkill = createAsyncThunk("skills/updateSkill", async ({ id, ...skillData }) => {
+  try {
+    const response = await axios.put(`${API_URL}/${id}`, skillData);
+    toast.success("Skill updated successfully");
+    return response.data;
+  } catch (error) {
+    toast.error("Failed to update skill");
+    throw error.response?.data || error.message;
+  }
+});
+
+export const deleteSkill = createAsyncThunk("skills/deleteSkill", async (id) => {
+  try {
+    await axios.delete(`${API_URL}/${id}`);
+    toast.success("Skill deleted successfully");
+    return id;
+  } catch (error) {
+    toast.error("Failed to delete skill");
+    throw error.response?.data || error.message;
+  }
+});
+
+// Slice
 const initialState = {
   skills: [],
-  skillCards: [
-    {
-      id: 1,
-      name: "Web Development",
-      category: "Technical",
-      description: "Build modern web applications",
-      courses: ["HTML/CSS", "JavaScript", "React", "Node.js"]
-    },
-    {
-      id: 2,
-      name: "Data Science",
-      category: "Technical",
-      description: "Analyze and interpret complex data",
-      courses: ["Python", "Pandas", "Machine Learning", "Statistics"]
-    },
-    {
-      id: 3,
-      name: "Mobile Development",
-      category: "Technical",
-      description: "Create mobile applications",
-      courses: ["React Native", "Flutter", "Swift", "Kotlin"]
-    },
-    {
-      id: 4,
-      name: "UI/UX Design",
-      category: "Design",
-      description: "Design user interfaces and experiences",
-      courses: ["Figma", "Adobe XD", "User Research", "Prototyping"]
-    },
-    {
-      id: 5,
-      name: "Project Management",
-      category: "Business",
-      description: "Lead projects to success",
-      courses: ["Agile", "Scrum", "Risk Management", "Leadership"]
-    },
-    {
-      id: 6,
-      name: "Digital Marketing",
-      category: "Marketing",
-      description: "Promote products online",
-      courses: ["SEO", "Social Media", "Content Marketing", "Analytics"]
-    },
-    {
-      id: 7,
-      name: "Cloud Computing",
-      category: "Technical",
-      description: "Work with cloud platforms",
-      courses: ["AWS", "Azure", "Google Cloud", "DevOps"]
-    },
-    {
-      id: 8,
-      name: "Cybersecurity",
-      category: "Technical",
-      description: "Protect systems and data",
-      courses: ["Ethical Hacking", "Network Security", "Cryptography", "Compliance"]
-    },
-    {
-      id: 9,
-      name: "Artificial Intelligence",
-      category: "Technical",
-      description: "Develop intelligent systems",
-      courses: ["Machine Learning", "Neural Networks", "NLP", "Computer Vision"]
-    },
-    {
-      id: 10,
-      name: "Blockchain",
-      category: "Technical",
-      description: "Work with decentralized systems",
-      courses: ["Smart Contracts", "Solidity", "Ethereum", "Cryptography"]
-    },
-    {
-      id: 11,
-      name: "Public Speaking",
-      category: "Soft Skills",
-      description: "Communicate effectively",
-      courses: ["Presentation Skills", "Storytelling", "Voice Modulation", "Body Language"]
-    },
-    {
-      id: 12,
-      name: "Creative Writing",
-      category: "Soft Skills",
-      description: "Express ideas through writing",
-      courses: ["Story Structure", "Character Development", "Editing", "Publishing"]
-    }
-  ]
+  currentSkill: null,
+  status: "idle",
+  error: null,
 };
 
 const skillSlice = createSlice({
   name: "skills",
   initialState,
   reducers: {
-    addSkill: (state, action) => {
-      state.skills.push({ 
-        id: Date.now(), 
-        ...action.payload,
-        progress: 0,
-        resources: [],
-        projects: [],
-        lastPracticed: new Date().toISOString()
+    clearCurrentSkill: (state) => {
+      state.currentSkill = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchSkills.pending, (state) => {
+        state.status = "loading";
+      })
+      .addCase(fetchSkills.fulfilled, (state, action) => {
+        state.status = "succeeded";
+        state.skills = action.payload;
+      })
+      .addCase(fetchSkills.rejected, (state, action) => {
+        state.status = "failed";
+        state.error = action.error.message;
+      })
+      .addCase(fetchSkillById.fulfilled, (state, action) => {
+        state.currentSkill = action.payload;
+      })
+      .addCase(addSkill.fulfilled, (state, action) => {
+        state.skills.push(action.payload);
+      })
+      .addCase(updateSkill.fulfilled, (state, action) => {
+        const index = state.skills.findIndex(skill => skill.id === action.payload.id);
+        if (index !== -1) {
+          state.skills[index] = action.payload;
+        }
+      })
+      .addCase(deleteSkill.fulfilled, (state, action) => {
+        state.skills = state.skills.filter(skill => skill.id !== action.payload);
       });
-    },
-    updateSkill: (state, action) => {
-      const index = state.skills.findIndex(skill => skill.id === action.payload.id);
-      if (index !== -1) state.skills[index] = action.payload;
-    },
-    deleteSkill: (state, action) => {
-      state.skills = state.skills.filter(skill => skill.id !== action.payload);
-    },
-    addResourceToSkill: (state, action) => {
-      const { skillId, resource } = action.payload;
-      const skill = state.skills.find(s => s.id === skillId);
-      if (skill) {
-        skill.resources.push(resource);
-      }
-    },
-    addProjectToSkill: (state, action) => {
-      const { skillId, project } = action.payload;
-      const skill = state.skills.find(s => s.id === skillId);
-      if (skill) {
-        skill.projects.push(project);
-      }
-    },
-    updateProgress: (state, action) => {
-      const { skillId, progress } = action.payload;
-      const skill = state.skills.find(s => s.id === skillId);
-      if (skill) {
-        skill.progress = progress;
-      }
-    }
   },
 });
 
-export const { 
-  addSkill, 
-  updateSkill, 
-  deleteSkill,
-  addResourceToSkill,
-  addProjectToSkill,
-  updateProgress
-} = skillSlice.actions;
-
+export const { clearCurrentSkill } = skillSlice.actions;
 export default skillSlice.reducer;

@@ -1,117 +1,231 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams, useNavigate } from 'react-router-dom';
-import { addSkill, updateSkill } from "./SkillSlice";
-import { BookOpen, BarChart2, Link as LinkIcon, ClipboardList, Calendar } from 'lucide-react';
+import { useParams, useNavigate } from "react-router-dom";
+import { updateSkill, addSkill, fetchSkillById, clearCurrentSkill } from "./SkillSlice"
+import { Pencil, Link as LinkIcon, ClipboardList, Calendar, BookOpen, FileText, Image } from "lucide-react";
+import toast from 'react-hot-toast';
 
-const SkillForm = ({ editData, setEditData }) => {
+const SkillForm = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const skillCards = useSelector(state => state.skills.skillCards);
-  const skills = useSelector(state => state.skills.skills);
-  
+  const { currentSkill, status } = useSelector((state) => state.skills);
+  const isEditMode = !!id;
+
   const [formData, setFormData] = useState({
     name: "",
-    level: "Beginner",
+    category: "",
+    description: "",
+    courses: [],
+    imageUrl: "",
     progress: 0,
-    resources: [],
-    projects: [],
+    goal: "",
     notes: "",
-    goalDate: ""
+    relatedProjects: []
   });
-  
-  const [newResource, setNewResource] = useState("");
+
+  const [newCourse, setNewCourse] = useState("");
   const [newProject, setNewProject] = useState("");
 
   useEffect(() => {
-    if (editData) {
-      setFormData(editData);
-    } else if (id) {
-      const cardData = skillCards.find(card => card.id === parseInt(id));
-      if (cardData) {
-        setFormData({
-          ...formData,
-          name: cardData.name,
-          category: cardData.category
-        });
-      }
+    if (isEditMode) {
+      dispatch(fetchSkillById(id));
     }
-  }, [editData, id]);
+
+    return () => {
+      dispatch(clearCurrentSkill());
+    };
+  }, [dispatch, id, isEditMode]);
+
+  useEffect(() => {
+    if (isEditMode && currentSkill) {
+      setFormData(currentSkill);
+    }
+  }, [currentSkill, isEditMode]);
 
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    const skillData = {
-      ...formData,
-      lastUpdated: new Date().toISOString()
-    };
-
-    if (editData) {
-      dispatch(updateSkill(skillData));
-      setEditData(null);
+    if (isEditMode) {
+      dispatch(updateSkill({ id, ...formData }))
+        .unwrap()
+        .then(() => {
+          toast.success('Skill updated successfully');
+          navigate(`/skills/${id}`);
+        })
+        .catch(() => {
+          toast.error('Failed to update skill');
+        });
     } else {
-      dispatch(addSkill(skillData));
+      dispatch(addSkill(formData))
+        .unwrap()
+        .then((newSkill) => {
+          toast.success('Skill added successfully');
+          navigate(`/skills/${newSkill.id}`);
+        })
+        .catch(() => {
+          toast.error('Failed to add skill');
+        });
     }
-
-    navigate('/skills/list');
   };
 
-  const addResource = () => {
-    if (newResource.trim()) {
+  const addCourse = () => {
+    if (newCourse.trim()) {
       setFormData({
         ...formData,
-        resources: [...formData.resources, newResource]
+        courses: [...formData.courses, newCourse]
       });
-      setNewResource("");
+      setNewCourse("");
     }
+  };
+
+  const removeCourse = (index) => {
+    const updatedCourses = [...formData.courses];
+    updatedCourses.splice(index, 1);
+    setFormData({ ...formData, courses: updatedCourses });
   };
 
   const addProject = () => {
     if (newProject.trim()) {
       setFormData({
         ...formData,
-        projects: [...formData.projects, newProject]
+        relatedProjects: [...formData.relatedProjects, newProject]
       });
       setNewProject("");
     }
   };
 
+  const removeProject = (index) => {
+    const updatedProjects = [...formData.relatedProjects];
+    updatedProjects.splice(index, 1);
+    setFormData({ ...formData, relatedProjects: updatedProjects });
+  };
+
+  if (isEditMode && status === 'loading') {
+    return <div className="text-center mt-20">Loading skill data...</div>;
+  }
+
   return (
-    <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+    <div className="max-w-3xl mx-auto p-6 bg-white rounded-xl shadow-md border border-gray-200 my-8">
       <h2 className="text-2xl font-bold mb-6 flex items-center">
         <BookOpen className="h-6 w-6 text-blue-500 mr-2" />
-        {editData ? "Update Skill" : "Add New Skill"}
+        {isEditMode ? "Edit Skill" : "Add New Skill"}
       </h2>
-      
-      <form onSubmit={handleSubmit} className="space-y-6">
+
+      <form onSubmit={handleSubmit} className="space-y-5">
+        {/* Skill Name */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Skill Name</label>
+          <label className="block mb-1 text-sm font-medium">Skill Name *</label>
           <input
             type="text"
             value={formData.name}
-            onChange={(e) => setFormData({...formData, name: e.target.value})}
+            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
             required
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
+        {/* Category */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Skill Level</label>
+          <label className="block mb-1 text-sm font-medium">Category *</label>
           <select
-            value={formData.level}
-            onChange={(e) => setFormData({...formData, level: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            value={formData.category}
+            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+            required
+            className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500"
           >
-            <option value="Beginner">Beginner</option>
-            <option value="Intermediate">Intermediate</option>
-            <option value="Advanced">Advanced</option>
-            <option value="Expert">Expert</option>
+            <option value="">Select a category</option>
+            <option value="Technical">Technical</option>
+            <option value="Design">Design</option>
+            <option value="Business">Business</option>
+            <option value="Marketing">Marketing</option>
+            <option value="Soft Skills">Soft Skills</option>
+            <option value="Other">Other</option>
           </select>
         </div>
 
+        {/* Description */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">
+          <label className="block mb-1 text-sm font-medium flex items-center">
+            <FileText className="w-4 h-4 mr-1" /> Description *
+          </label>
+          <textarea
+            value={formData.description}
+            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            rows="3"
+            required
+            className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          ></textarea>
+        </div>
+
+        {/* Courses */}
+        <div>
+          <label className="block mb-1 text-sm font-medium flex items-center">
+            <LinkIcon className="w-4 h-4 mr-1" /> Courses
+          </label>
+          <div className="flex mb-2">
+            <input
+              type="text"
+              value={newCourse}
+              onChange={(e) => setNewCourse(e.target.value)}
+              className="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Add a course name or URL"
+            />
+            <button
+              type="button"
+              onClick={addCourse}
+              className="bg-blue-500 text-white px-4 rounded-r-md hover:bg-blue-600"
+            >
+              Add
+            </button>
+          </div>
+          {formData.courses.length > 0 && (
+            <ul className="space-y-1 mb-2">
+              {formData.courses.map((course, index) => (
+                <li key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200">
+                  <span className="text-sm text-gray-700 truncate">{course}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeCourse(index)}
+                    className="text-red-500 hover:text-red-700 text-lg font-bold"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Image URL */}
+        <div>
+          <label className="block mb-1 text-sm font-medium flex items-center">
+            <Image className="w-4 h-4 mr-1" /> Image URL
+          </label>
+          <input
+            type="url"
+            value={formData.imageUrl}
+            onChange={(e) => setFormData({ ...formData, imageUrl: e.target.value })}
+            className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            placeholder=""
+          />
+          {formData.imageUrl && (
+            <div className="mt-2">
+              <img 
+                src={formData.imageUrl} 
+                alt="Preview" 
+                className="h-32 object-cover rounded-md border border-gray-200"
+                onError={(e) => {
+                  e.target.src = "";
+                }}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Progress */}
+        <div>
+          <label className="block text-sm font-medium mb-1">
             Progress ({formData.progress}%)
           </label>
           <input
@@ -119,101 +233,80 @@ const SkillForm = ({ editData, setEditData }) => {
             min="0"
             max="100"
             value={formData.progress}
-            onChange={(e) => setFormData({...formData, progress: parseInt(e.target.value)})}
+            onChange={(e) => setFormData({ ...formData, progress: parseInt(e.target.value) })}
             className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
           />
         </div>
 
+        {/* Projects */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-            <LinkIcon className="h-4 w-4 mr-1" />
-            Learning Resources
-          </label>
-          <div className="flex mb-2">
-            <input
-              type="text"
-              value={newResource}
-              onChange={(e) => setNewResource(e.target.value)}
-              placeholder="Add resource URL"
-              className="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500"
-            />
-            <button
-              type="button"
-              onClick={addResource}
-              className="bg-blue-500 text-white px-3 rounded-r-md hover:bg-blue-600"
-            >
-              Add
-            </button>
-          </div>
-          <ul className="space-y-1">
-            {formData.resources.map((resource, index) => (
-              <li key={index} className="text-sm text-blue-600 hover:underline">
-                <a href={resource} target="_blank" rel="noopener noreferrer">
-                  {resource}
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-            <ClipboardList className="h-4 w-4 mr-1" />
-            Related Projects
+          <label className="block mb-1 text-sm font-medium flex items-center">
+            <ClipboardList className="w-4 h-4 mr-1" /> Related Projects
           </label>
           <div className="flex mb-2">
             <input
               type="text"
               value={newProject}
               onChange={(e) => setNewProject(e.target.value)}
-              placeholder="Project name"
               className="flex-1 p-2 border border-gray-300 rounded-l-md focus:ring-blue-500 focus:border-blue-500"
+              placeholder="Project name"
             />
             <button
               type="button"
               onClick={addProject}
-              className="bg-blue-500 text-white px-3 rounded-r-md hover:bg-blue-600"
+              className="bg-blue-500 text-white px-4 rounded-r-md hover:bg-blue-600"
             >
               Add
             </button>
           </div>
-          <ul className="space-y-1">
-            {formData.projects.map((project, index) => (
-              <li key={index} className="text-sm text-gray-700">
-                {project}
-              </li>
-            ))}
-          </ul>
+          {formData.relatedProjects.length > 0 && (
+            <ul className="space-y-1 mb-2">
+              {formData.relatedProjects.map((project, index) => (
+                <li key={index} className="flex items-center justify-between bg-gray-50 p-2 rounded border border-gray-200">
+                  <span className="text-sm text-gray-700">{project}</span>
+                  <button
+                    type="button"
+                    onClick={() => removeProject(index)}
+                    className="text-red-500 hover:text-red-700 text-lg font-bold"
+                  >
+                    ×
+                  </button>
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
 
+        {/* Notes */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+          <label className="block text-sm font-medium mb-1">Notes</label>
           <textarea
             value={formData.notes}
-            onChange={(e) => setFormData({...formData, notes: e.target.value})}
-            rows="3"
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
-          />
+            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            rows="2"
+            className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500"
+          ></textarea>
         </div>
 
+        {/* Goal Date */}
         <div>
-          <label className="block text-sm font-medium text-gray-700 mb-1 flex items-center">
-            <Calendar className="h-4 w-4 mr-1" />
-            Goal Completion Date
+          <label className="block mb-1 text-sm font-medium flex items-center">
+            <Calendar className="w-4 h-4 mr-1" /> Goal Date
           </label>
           <input
             type="date"
-            value={formData.goalDate}
-            onChange={(e) => setFormData({...formData, goalDate: e.target.value})}
-            className="w-full p-2 border border-gray-300 rounded-md focus:ring-blue-500 focus:border-blue-500"
+            value={formData.goal}
+            onChange={(e) => setFormData({ ...formData, goal: e.target.value })}
+            className="w-full border border-gray-300 p-2 rounded-md focus:ring-blue-500 focus:border-blue-500"
           />
         </div>
 
-        <div className="flex justify-end space-x-4">
+        {/* Actions */}
+        <div className="flex justify-end space-x-3 pt-4">
           <button
             type="button"
-            onClick={() => navigate('/skills')}
-            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            onClick={() => navigate(isEditMode ? `/skills/${id}` : '/skills')}
+            className="px-4 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
           >
             Cancel
           </button>
@@ -221,7 +314,7 @@ const SkillForm = ({ editData, setEditData }) => {
             type="submit"
             className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
           >
-            {editData ? "Update Skill" : "Save Skill"}
+            {isEditMode ? "Update Skill" : "Save Skill"}
           </button>
         </div>
       </form>
