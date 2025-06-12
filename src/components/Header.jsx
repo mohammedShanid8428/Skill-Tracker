@@ -1,123 +1,83 @@
-import { Home, LayoutDashboard, Code2, FolderKanban, BadgeCheck, Menu } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { useState } from "react";
+import {
+  Home,
+  LayoutDashboard,
+  Code2,
+  FolderKanban,
+  BadgeCheck,
+  Menu,
+  X
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
-const Header = () => (
-  <div className="bg-gradient-to-br from-gray-50 to-gray-100">
-    <nav className="bg-white shadow-lg border-b border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between h-16 items-center">
-          {/* Logo/Brand */}
-          <div className="flex-shrink-0 flex items-center">
-            <Code2 className="h-8 w-8 text-indigo-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900">SkillTracker</span>
+const Header = () => {
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks = [
+    { to: "/", label: "Home", icon: <Home className="w-5 h-5 mr-1" /> },
+    { to: "/dashboard", label: "Dashboard", icon: <LayoutDashboard className="w-5 h-5 mr-1" /> },
+    { to: "/skills", label: "Skills", icon: <Code2 className="w-5 h-5 mr-1" /> },
+    
+  ];
+
+  return (
+    <header className="bg-gradient-to-r from-indigo-900 to-blue-800 text-white shadow-lg sticky top-0 z-50">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex justify-between items-center h-20">
+          {/* Logo */}
+          <div className="flex items-center">
+            <Code2 className="h-8 w-8 text-cyan-400" />
+            <span className="ml-2 text-2xl font-bold tracking-tight text-white">
+              SkillTracker
+            </span>
           </div>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:ml-6 md:flex md:space-x-8">
-            <Link
-              to="/"
-              className="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-            >
-              <Home className="w-5 h-5 mr-1" />
-              Home
-            </Link>
-            <Link
-              to="/dashboard"
-              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-            >
-              <LayoutDashboard className="w-5 h-5 mr-1" />
-              Dashboard
-            </Link>
-            <Link
-              to="/skills"
-              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-            >
-              <Code2 className="w-5 h-5 mr-1" />
-              Skills
-            </Link>
-            <Link
-              to="/projects"
-              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-            >
-              <FolderKanban className="w-5 h-5 mr-1" />
-              Projects
-            </Link>
-            <Link
-              to="/certifications"
-              className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
-            >
-              <BadgeCheck className="w-5 h-5 mr-1" />
-              Certifications
-            </Link>
+          {/* Desktop Menu */}
+          <div className="hidden md:flex space-x-6 items-center">
+            {navLinks.map(({ to, label, icon }) => (
+              <Link
+                key={label}
+                to={to}
+                className="flex items-center gap-1 text-md font-medium hover:text-cyan-300 transition"
+              >
+                {icon}
+                {label}
+              </Link>
+            ))}
           </div>
 
-          {/* Mobile menu button */}
-          <div className="-mr-2 flex items-center md:hidden">
+          {/* Mobile Menu Toggle */}
+          <div className="md:hidden">
             <button
-              type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-indigo-500"
-              aria-controls="mobile-menu"
-              aria-expanded="false"
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="text-white p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-white"
             >
-              <span className="sr-only">Open main menu</span>
-              <Menu className="block h-6 w-6" />
+              {menuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </button>
           </div>
         </div>
-      </div>
+      </nav>
 
-      {/* Mobile menu (hidden by default) */}
-      <div className="md:hidden hidden" id="mobile-menu">
-        <div className="pt-2 pb-3 space-y-1">
-          <Link
-            to="/"
-            className="bg-indigo-50 border-indigo-500 text-indigo-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-          >
-            <div className="flex items-center">
-              <Home className="w-5 h-5 mr-2" />
-              Home
-            </div>
-          </Link>
-          <Link
-            to="/dashboard"
-            className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-          >
-            <div className="flex items-center">
-              <LayoutDashboard className="w-5 h-5 mr-2" />
-              Dashboard
-            </div>
-          </Link>
-          <Link
-            to="/skills"
-            className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-          >
-            <div className="flex items-center">
-              <Code2 className="w-5 h-5 mr-2" />
-              Skills
-            </div>
-          </Link>
-          <Link
-            to="/projects"
-            className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-          >
-            <div className="flex items-center">
-              <FolderKanban className="w-5 h-5 mr-2" />
-              Projects
-            </div>
-          </Link>
-          <Link
-            to="/certifications"
-            className="border-transparent text-gray-500 hover:bg-gray-50 hover:border-gray-300 hover:text-gray-700 block pl-3 pr-4 py-2 border-l-4 text-base font-medium"
-          >
-            <div className="flex items-center">
-              <BadgeCheck className="w-5 h-5 mr-2" />
-              Certifications
-            </div>
-          </Link>
+      {/* Mobile Menu Panel */}
+      {menuOpen && (
+        <div className="md:hidden bg-indigo-950 border-t border-blue-700">
+          <div className="px-4 pt-3 pb-4 space-y-2">
+            {navLinks.map(({ to, label, icon }) => (
+              <Link
+                key={label}
+                to={to}
+                onClick={() => setMenuOpen(false)}
+                className="flex items-center px-3 py-2 rounded-md text-md font-medium text-white hover:bg-blue-700 transition"
+              >
+                {icon}
+                {label}
+              </Link>
+            ))}
+          </div>
         </div>
-      </div>
-    </nav>
-  </div>
-);
+      )}
+    </header>
+  );
+};
 
 export default Header;

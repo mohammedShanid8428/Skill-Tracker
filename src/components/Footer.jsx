@@ -1,81 +1,92 @@
-import { Home, LayoutDashboard, Code2, Github, Linkedin, Twitter, Mail, Heart } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import {
+  Home,
+  LayoutDashboard,
+  Code2,
+  Github,
+  Linkedin,
+  Twitter,
+  Mail,
+  Heart,
+} from "lucide-react";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
-    <footer className="bg-white border-t border-gray-200">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-          {/* Brand Section */}
-          <div className="md:col-span-2">
-            <div className="flex items-center">
-              <Code2 className="h-8 w-8 text-indigo-600" />
-              <span className="ml-2 text-xl font-bold text-gray-900">SkillTracker</span>
-            </div>
-            <p className="mt-4 text-gray-600">
-              Track and showcase your skills, projects, and certifications in one place.
-              Build your professional portfolio effortlessly.
-            </p>
+    <footer className="bg-gradient-to-r from-indigo-900 to-blue-800 text-white text-sm">
+      <div className="max-w-7xl mx-auto px-4 py-6 flex flex-col md:flex-row justify-between items-center md:items-start space-y-6 md:space-y-0 md:space-x-12">
+        {/* Brand */}
+        <div className="flex-1">
+          <div className="flex items-center mb-2">
+            <Code2 className="h-5 w-5 text-cyan-400" />
+            <span className="ml-2 font-bold text-lg">SkillTracker</span>
           </div>
-
-          {/* Quick Links */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
-              Quick Links
-            </h3>
-            <nav className="space-y-3">
-              <Link to="/" className="flex items-center text-gray-600 hover:text-indigo-500 transition-colors">
-                <Home className="w-4 h-4 mr-2" />
-                Home
-              </Link>
-              <Link to="/dashboard" className="flex items-center text-gray-600 hover:text-indigo-500 transition-colors">
-                <LayoutDashboard className="w-4 h-4 mr-2" />
-                Dashboard
-              </Link>
-              <Link to="/skills" className="flex items-center text-gray-600 hover:text-indigo-500 transition-colors">
-                <Code2 className="w-4 h-4 mr-2" />
-                Skills
-              </Link>
-            </nav>
-          </div>
-
-          {/* Connect Section */}
-          <div>
-            <h3 className="text-sm font-semibold text-gray-900 tracking-wider uppercase mb-4">
-              Connect With Us
-            </h3>
-            <div className="flex space-x-4">
-              <a href="https://github.com" className="text-gray-500 hover:text-indigo-600 transition-colors">
-                <Github className="h-5 w-5" />
-              </a>
-              <a href="https://linkedin.com" className="text-gray-500 hover:text-indigo-600 transition-colors">
-                <Linkedin className="h-5 w-5" />
-              </a>
-              <a href="https://twitter.com" className="text-gray-500 hover:text-indigo-600 transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="mailto:contact@example.com" className="text-gray-500 hover:text-indigo-600 transition-colors">
-                <Mail className="h-5 w-5" />
-              </a>
-            </div>
-            <div className="mt-4">
-              <a href="mailto:contact@skilltracker.com" className="text-gray-600 hover:text-indigo-600 text-sm flex items-center">
-                <Mail className="w-4 h-4 mr-2" />
-                contact@skilltracker.com
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Copyright Section */}
-        <div className="mt-12 pt-8 border-t border-gray-200 flex flex-col md:flex-row justify-between items-center">
-          <p className="text-gray-500 text-sm flex items-center">
-            Made with <Heart className="h-4 w-4 mx-1 text-red-500" /> by SkillTracker Team
-          </p>
-          <p className="text-gray-500 text-sm mt-4 md:mt-0">
-            &copy; {new Date().getFullYear()} SkillTracker. All rights reserved.
+          <p className="text-blue-100 leading-snug max-w-sm">
+            Track and showcase your skills, projects, and certifications in one
+            place. Build your professional portfolio effortlessly.
           </p>
         </div>
+
+        {/* Quick Links */}
+        <div className="flex-1">
+          <h3 className="text-white font-semibold mb-3 uppercase text-xs tracking-wider">
+            Quick Links
+          </h3>
+          <nav className="flex flex-col space-y-2 text-blue-200">
+            <Link to="/" className="hover:text-cyan-300 flex items-center">
+              <Home className="w-4 h-4 mr-2" />
+              Home
+            </Link>
+            <Link
+              to="/dashboard"
+              className="hover:text-cyan-300 flex items-center"
+            >
+              <LayoutDashboard className="w-4 h-4 mr-2" />
+              Dashboard
+            </Link>
+            <Link to="/skills" className="hover:text-cyan-300 flex items-center">
+              <Code2 className="w-4 h-4 mr-2" />
+              Skills
+            </Link>
+          </nav>
+        </div>
+
+        {/* Connect With Us */}
+        <div className="flex-1">
+          <h3 className="text-white font-semibold mb-3 uppercase text-xs tracking-wider">
+            Connect With Us
+          </h3>
+          <div className="flex space-x-4 text-blue-300 mb-2">
+            <a href="https://github.com" className="hover:text-cyan-300">
+              <Github className="h-4 w-4" />
+            </a>
+            <a href="https://linkedin.com" className="hover:text-cyan-300">
+              <Linkedin className="h-4 w-4" />
+            </a>
+            <a href="https://twitter.com" className="hover:text-cyan-300">
+              <Twitter className="h-4 w-4" />
+            </a>
+            <a href="mailto:contact@skilltracker.com" className="hover:text-cyan-300">
+              <Mail className="h-4 w-4" />
+            </a>
+          </div>
+          <a
+            href="mailto:contact@skilltracker.com"
+            className="text-blue-100 hover:text-cyan-300 flex items-center"
+          >
+            <Mail className="w-4 h-4 mr-2" />
+            contact@skilltracker.com
+          </a>
+        </div>
+      </div>
+
+      {/* Copyright Section */}
+      <div className="border-t border-blue-700 text-center py-3 px-4 text-blue-200 text-xs">
+        <p className="flex justify-center items-center flex-wrap gap-1">
+          Made with
+          <Heart className="h-3 w-3 text-red-500 mx-1" fill="red" />
+          by <span className="text-white font-semibold">Mohammed Shanid .T</span>
+          &copy; {new Date().getFullYear()} SkillTracker. All rights reserved.
+        </p>
       </div>
     </footer>
   );
