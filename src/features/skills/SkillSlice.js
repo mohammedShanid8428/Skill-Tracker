@@ -3,7 +3,8 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-const API_URL = "https://skill-tracker-server.onrender.com";
+const API_URL = "https://skill-tracker-server.onrender.com/skills";
+
 
 // Thunks
 export const fetchSkills = createAsyncThunk("skills/fetchSkills", async () => {
