@@ -1,5 +1,4 @@
-// src/features/skills/SkillDetails.jsx
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
@@ -11,9 +10,9 @@ import {
   CalendarDays,
   BadgeCheck,
   LayoutDashboard,
-  LoaderCircle,
   ImageOff,
 } from 'lucide-react';
+import { Player } from '@lottiefiles/react-lottie-player';
 import { fetchSkillById, deleteSkill, clearCurrentSkill } from './SkillSlice';
 import toast from 'react-hot-toast';
 
@@ -21,7 +20,9 @@ const SkillDetails = () => {
   const { id } = useParams();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { currentSkill, status } = useSelector((state) => state.skills);
+  const { currentSkill, status, error } = useSelector((state) => state.skills);
+
+  const [lottieFailed, setLottieFailed] = useState(false);
 
   useEffect(() => {
     if (id) dispatch(fetchSkillById(id));
@@ -48,9 +49,31 @@ const SkillDetails = () => {
 
   if (status === 'loading') {
     return (
-      <div className="flex flex-col items-center justify-center mt-20 text-gray-500">
-        <LoaderCircle className="animate-spin w-6 h-6 mb-2" />
-        Loading skill details...
+      <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+        {!lottieFailed ? (
+          <Player
+            autoplay
+            loop
+            src="https://assets3.lottiefiles.com/packages/lf20_usmfx6bp.json"
+            style={{ height: "200px", width: "200px" }}
+            onEvent={(e) => {
+              if (e === "error") setLottieFailed(true);
+            }}
+          />
+        ) : (
+          <>
+            <LoaderCircle className="animate-spin w-6 h-6 mb-2" />
+            Loading skill details...
+          </>
+        )}
+      </div>
+    );
+  }
+
+  if (status === 'failed') {
+    return (
+      <div className="text-center mt-20 text-red-500 text-lg">
+        {error || "Failed to load skill details."}
       </div>
     );
   }
@@ -58,7 +81,15 @@ const SkillDetails = () => {
   if (!currentSkill) {
     return (
       <div className="text-center mt-20 text-gray-500 text-lg">
-        Skill not found.
+        <Player
+            autoplay
+            loop
+            src="https://assets3.lottiefiles.com/packages/lf20_usmfx6bp.json"
+            style={{ height: "200px", width: "200px" }}
+            onEvent={(e) => {
+              if (e === "error") setLottieFailed(true);
+            }}
+          />
       </div>
     );
   }
@@ -174,9 +205,8 @@ const SkillDetails = () => {
         </div>
       </div>
 
-      {/* Courses */}
+      {/* Courses & Related Projects */}
       <div className="grid md:grid-cols-2 gap-6">
-        {/* Courses */}
         {currentSkill.courses?.length > 0 && (
           <div className="bg-white p-5 rounded-xl shadow-sm border space-y-3">
             <h3 className="text-gray-700 font-medium flex items-center gap-2">
@@ -191,7 +221,6 @@ const SkillDetails = () => {
           </div>
         )}
 
-        {/* Related Projects */}
         {currentSkill.relatedProjects?.length > 0 && (
           <div className="bg-white p-5 rounded-xl shadow-sm border space-y-3">
             <h3 className="text-gray-700 font-medium flex items-center gap-2">

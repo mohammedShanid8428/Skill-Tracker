@@ -25,7 +25,7 @@ const SkillList = () => {
     <div className="max-w-6xl mx-auto px-4 py-8">
       <div className="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
         <h1 className="text-3xl font-bold text-gray-800">My Skills</h1>
-        
+
         <div className="flex gap-4">
           <select
             value={selectedCategory}
@@ -38,7 +38,7 @@ const SkillList = () => {
               </option>
             ))}
           </select>
-          
+
           <Link
             to="/skills/new"
             className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
@@ -49,8 +49,20 @@ const SkillList = () => {
         </div>
       </div>
 
-      {status === "loading" && <p className="text-center">Loading skills...</p>}
-      {status === "failed" && <p className="text-center text-red-500">{error}</p>}
+      {status === 'loading' && (
+        <div className="flex justify-center items-center h-64">
+          <Player
+            autoplay
+            loop
+            src="https://assets3.lottiefiles.com/packages/lf20_usmfx6bp.json"
+            style={{ height: '200px', width: '200px' }}
+          />
+        </div>
+      )}
+
+      {status === 'failed' && (
+        <p className="text-center text-red-500">{error}</p>
+      )}
 
       {status === "succeeded" && filteredSkills.length === 0 ? (
         <div className="text-center text-gray-500 mt-10">

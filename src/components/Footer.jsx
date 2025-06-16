@@ -7,8 +7,10 @@ import {
   Twitter,
   Mail,
   Heart,
+  ImageOff,
 } from "lucide-react";
 import { Link } from "react-router-dom";
+import logo from "../assets/logo.png";
 
 const Footer = () => {
   return (
@@ -17,7 +19,15 @@ const Footer = () => {
         {/* Brand */}
         <div className="flex-1">
           <div className="flex items-center mb-2">
-            <Code2 className="h-5 w-5 text-cyan-400" />
+            <img
+              src={logo}
+              alt="Logo"
+              className="h-10 w-auto object-contain"
+              onError={(e) => {
+                e.target.onerror = null;
+                e.target.src = "https://via.placeholder.com/100x40?text=Logo";
+              }}
+            />
             <span className="ml-2 font-bold text-lg">SkillTracker</span>
           </div>
           <p className="text-blue-100 leading-snug max-w-sm">
@@ -56,13 +66,13 @@ const Footer = () => {
             Connect With Us
           </h3>
           <div className="flex space-x-4 text-blue-300 mb-2">
-            <a href="https://github.com" className="hover:text-cyan-300">
+            <a href="https://github.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-300">
               <Github className="h-4 w-4" />
             </a>
-            <a href="https://linkedin.com" className="hover:text-cyan-300">
+            <a href="https://linkedin.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-300">
               <Linkedin className="h-4 w-4" />
             </a>
-            <a href="https://twitter.com" className="hover:text-cyan-300">
+            <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" className="hover:text-cyan-300">
               <Twitter className="h-4 w-4" />
             </a>
             <a href="mailto:contact@skilltracker.com" className="hover:text-cyan-300">
@@ -79,7 +89,7 @@ const Footer = () => {
         </div>
       </div>
 
-      {/* Copyright Section */}
+      {/* Copyright */}
       <div className="border-t border-blue-700 text-center py-3 px-4 text-blue-200 text-xs">
         <p className="flex justify-center items-center flex-wrap gap-1">
           Made with

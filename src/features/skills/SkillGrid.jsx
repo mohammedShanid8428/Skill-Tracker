@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
 import SkillCard from './SkillCard';
 import { fetchSkills } from './SkillSlice'
+import { Player } from "@lottiefiles/react-lottie-player";
 
 const SkillGrid = () => {
   const dispatch = useDispatch();
@@ -27,8 +28,22 @@ const SkillGrid = () => {
         </Link>
       </div>
 
-      {status === 'loading' && <p className="text-center text-gray-500">Loading...</p>}
-      {status === 'failed' && <p className="text-center text-red-500">{error}</p>}
+      {status === 'loading' && (
+        <div className="flex justify-center items-center h-64">
+          <Player
+            autoplay
+            loop
+            src="https://assets3.lottiefiles.com/packages/lf20_usmfx6bp.json"
+            style={{ height: '200px', width: '200px' }}
+          />
+        </div>
+      )}
+
+      {status === 'failed' && (
+        <p className="text-center text-red-500">{error}</p>
+      )}
+
+
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {skills.map((skill, index) => (

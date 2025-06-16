@@ -1,4 +1,5 @@
 import { useState } from "react";
+import logo from "../assets/logo.png"
 import {
   Home,
   LayoutDashboard,
@@ -24,9 +25,8 @@ const Header = () => {
     <header className="bg-gradient-to-r from-indigo-900 to-blue-800 text-white shadow-lg sticky top-0 z-50">
       <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-20">
-          {/* Logo */}
           <div className="flex items-center">
-            <Code2 className="h-8 w-8 text-cyan-400" />
+            <img src={logo} alt="Logo" className="h-10 w-auto" />
             <span className="ml-2 text-2xl font-bold tracking-tight text-white">
               SkillTracker
             </span>
